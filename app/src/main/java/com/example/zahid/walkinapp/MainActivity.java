@@ -1,9 +1,12 @@
 package com.example.zahid.walkinapp;
 
+import android.app.admin.DevicePolicyManager;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.PowerManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -24,10 +27,22 @@ public class MainActivity extends AppCompatActivity {
     //private ImageView imgActivity;
     private Button btnStartTrcking, btnStopTracking;
 
+    DevicePolicyManager policyManager;
+    ComponentName adminReceiver;
+    boolean admin;
+
+    Context context;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        context = this;
+
+        policyManager = (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
+
+        adminReceiver = new ComponentName(context,ScreenOffAdminReceiver.class);
+        admin = policyManager.isAdminActive(adminReceiver);
 
         txtActivity = findViewById(R.id.txt_activity);
         txtConfidence = findViewById(R.id.txt_confidence);
@@ -46,6 +61,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 stopTracking();
+
+
+//                if (admin) {
+//
+//                    policyManager.lockNow();
+//                }
             }
         });
 
@@ -90,6 +111,9 @@ public class MainActivity extends AppCompatActivity {
             }
             case DetectedActivity.STILL: {
                 label = "No Move";
+
+
+
                 break;
             }
             case DetectedActivity.TILTING: {
